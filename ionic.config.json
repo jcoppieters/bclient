@@ -1,0 +1,7 @@
+{
+  "name": "bclient",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
