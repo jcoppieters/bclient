@@ -1,0 +1,37 @@
+ion-content {
+  --background: var(--ion-color-light);
+}
+ion-list {
+  background: transparent;
+}
+ion-item-group {
+  padding: 16px;
+  border-radius: 10px;
+  background: #fff;
+}
+.error ion-label {
+  color: var(--ion-color-danger);
+}
+
+form {
+  padding: 0 16px;
+}
+
+ion-button {
+  margin: 16px 0;
+}
+
+// ion-item {
+//   margin-top: 40px;
+// }
+
+// ion-segment {
+//   margin-top: 25px
+// }
+// ion-segment-button ion-label {
+//   color: var(--ion-color-dark);
+//   // font-weight: bold;
+//   font-size: 14px;
+// }
+
+// form ion-label { font-weight: bold }

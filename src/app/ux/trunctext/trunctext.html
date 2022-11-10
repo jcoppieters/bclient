@@ -1,0 +1,11 @@
+<ion-text *ngIf="text?.length <= limit">{{text}}</ion-text>
+
+<ion-text *ngIf="truncating && text?.length > limit">
+  {{text.substring(0, limit)}}
+  <button ion-button (click)="toggle()">show more</button>
+</ion-text>
+
+<ion-text *ngIf="!truncating && text?.length > limit">
+  {{text}}
+  <button ion-button (click)="toggle()">show less</button>
+</ion-text>

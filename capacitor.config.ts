@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'be.bouwsoft.blue',
   appName: 'bclient',
   webDir: 'www',
   bundledWebRuntime: false

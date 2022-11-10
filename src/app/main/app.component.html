@@ -1,0 +1,48 @@
+<ion-app>
+
+  <ion-split-pane contentId="main-content">
+    <ion-menu contentId="main-content" type="overlay" [hidden]="!loggedIn()">
+      <ion-content>
+
+        <ion-list id="module-list">
+          <ion-list-header>Blue</ion-list-header>
+          <ion-note>{{ "global.welcome" |_ }} {{ username }}</ion-note>
+
+          <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
+            <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
+              <ion-icon slot="start" name="{{p.icon}}"></ion-icon>
+              <ion-label>{{ "modules." + p.title |_ }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+
+
+        <ion-list id="action-list" lines="none">
+          <ion-list-header>Actions</ion-list-header>
+
+          <ion-item *ngFor="let a of actions" routerDirection="root" [routerLink]="[a.url]" lines="none" detail="false">
+            <ion-icon slot="start" name="{{a.icon}}"></ion-icon>
+            <ion-label>{{ "action." + a.title |_ }}</ion-label>
+          </ion-item>
+        </ion-list>
+
+
+        <ion-list id="user-list" lines="none">
+          <ion-list-header>{{ "settings.title" |_ }}</ion-list-header>
+
+          <ion-item>
+            <ion-icon slot="start" name="settings"></ion-icon>
+            <ion-label>{{ "settings.title" |_ }}</ion-label>
+          </ion-item>
+          <ion-item (click)="doLogout()">
+            <ion-icon slot="start" name="log-out"></ion-icon>
+            <ion-label>{{ "settings.logout" |_ }}</ion-label>
+          </ion-item>
+
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
+</ion-app>
