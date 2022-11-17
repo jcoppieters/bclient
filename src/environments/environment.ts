@@ -4,7 +4,11 @@
 
 export const environment = {
   production: false,
-  server: "localhost"
+  server: "http://localhost:3002",
+  cognito: {
+    userPoolId: "eu-central-1_vaYSfNyYz",
+    userPoolClientId: "3m9a0852e1fvgtmh89h5oke9jp"
+  }
 };
 
 /*

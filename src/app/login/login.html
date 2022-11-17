@@ -2,15 +2,26 @@
   <ion-toolbar color="primary">
     <ion-title>{{ ((showPage) ? "login.title" : "login.authenticating") |_ }}</ion-title>
   </ion-toolbar>
+
   <ion-segment [(ngModel)]="current" *ngIf="showPage">
     <ion-segment-button value="login" (click)="reFocus()">
       <ion-label>{{ "login.login" |_ }}</ion-label>
     </ion-segment-button>
+
     <ion-segment-button value="register" (click)="reFocus()">
       <ion-label>{{ "login.register" |_ }}</ion-label>
     </ion-segment-button>
+
+    <ion-segment-button value="confirmEmail" (click)="reFocus()" *ngIf="allowConfirmEmail">
+      <ion-label>{{ "login.confirmEmail" |_ }}</ion-label>
+    </ion-segment-button>
+
     <ion-segment-button value="forgot" (click)="reFocus()">
       <ion-label>{{ "login.forgot" |_ }}</ion-label>
+    </ion-segment-button>
+
+    <ion-segment-button value="confirmPassword" (click)="reFocus()" *ngIf="allowConfirmPassword">
+      <ion-label>{{ "login.confirmPassword" |_ }}</ion-label>
     </ion-segment-button>
   </ion-segment>
 </ion-header>
@@ -41,23 +52,51 @@
           <ion-note slot="helper">{{ "login.name.extra" |_ }}</ion-note>
         </ion-item>
 
-        <ion-item *ngIf="current !== 'forgot'">
+        <ion-item *ngIf="current === 'register'">
+          <ion-label position="stacked" for="phone">{{ "login.phone" |_ }}</ion-label>
+          <ion-input [(ngModel)]="phone" name="phone" id="phone" type="tel" #phoneRef
+                     minlength="10"></ion-input>
+          <ion-note slot="helper">{{ "login.phone.extra" |_ }}</ion-note>
+        </ion-item>
+
+        <ion-item *ngIf="(current === 'confirmEmail') || (current === 'confirmPassword')">
+          <ion-label position="stacked" for="code">{{ "login.code" |_ }}</ion-label>
+          <ion-input [(ngModel)]="code" name="code" id="code" #codeRef
+                    required minlength="6"></ion-input>      
+          <ion-note slot="helper">{{ "login.code.extra" |_ }}</ion-note>
+        </ion-item>
+
+        <ion-item *ngIf="(current === 'register') || (current === 'login') || (current === 'confirmPassword')">
           <ion-label position="stacked" for="password">{{ "login.password" |_ }}</ion-label>
-          <ion-input type="password" [(ngModel)]="password" name="password" id="password" #passwordRef
-                    required minlength="6"></ion-input>
+          <ion-input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" id="password" #passwordRef
+                    required minlength="8"></ion-input>
+
+          <ion-note slot="helper">{{ "login.password.extra" |_ }}</ion-note>
         </ion-item>
       </ion-item-group>
 
-      <ion-button expand="block" (click)="doSubmit()" [disabled]="! forgotOK()" *ngIf="current === 'forgot'">
-        {{ "login.doForgot" |_ }}
+
+      <ion-button expand="block" (click)="login()" [disabled]="! loginOK()" *ngIf="current === 'login'">
+        {{ "login.doLogin" |_ }}
       </ion-button>
 
-      <ion-button expand="block" (click)="doSubmit()" [disabled]="! registerOK()" *ngIf="current === 'register'">
+      <ion-button expand="block" (click)="register()" [disabled]="! registerOK()" *ngIf="current === 'register'">
         {{ "login.doRegister" |_ }}
       </ion-button>
 
-      <ion-button expand="block" (click)="doSubmit()" [disabled]="! loginOK()" *ngIf="current === 'login'">
-        {{ "login.doLogin" |_ }}
+      <ion-button expand="block" (click)="confirmEmail()" [disabled]="! confirmEmailOK()" *ngIf="current === 'confirmEmail'">
+        {{ "login.doConfirmEmail" |_ }}
+      </ion-button>
+      <ion-button expand="block" (click)="askEmailVerificationCode()" [disabled]="! confirmEmailOK()" *ngIf="current === 'confirmEmail'">
+        {{ "login.doAskNewCode" |_ }}
+      </ion-button>
+
+      <ion-button expand="block" (click)="forgot()" [disabled]="! forgotOK()" *ngIf="current === 'forgot'">
+        {{ "login.doForgot" |_ }}
+      </ion-button>
+
+      <ion-button expand="block" (click)="confirmPassword()" [disabled]="! confirmPasswordOK()" *ngIf="current === 'confirmPassword'">
+        {{ "login.doConfirmPassword" |_ }}
       </ion-button>
   
     </ion-list>

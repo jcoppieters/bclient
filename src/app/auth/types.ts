@@ -35,9 +35,11 @@ export interface User {
   email: string;
   settings: Settings;
   language: string;
+  phone: string;
+  username?: string;  // Cognito
 }
 export const kEmptyUser = { 
-  name: "", email: "", 
+  name: "", email: "", phone: "",
   settings: {...kEmptySettings}, 
   language: "EN"
 };
@@ -47,6 +49,7 @@ export interface UserRegister {
   email: string;
   password: string;
   language: string;
+  phone: string;
 }
 
 export interface UserLogin {
@@ -63,8 +66,12 @@ export interface UserForgot {
 
 export interface AuthResponse extends ServerResponse {
   user: User
-  accessToken: string;
-  expiresIn: number;
+  token: string;
+  expires: number;
+}
+
+export interface UserResponse extends ServerResponse {
+  user: User;
 }
 
 

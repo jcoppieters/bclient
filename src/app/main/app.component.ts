@@ -27,14 +27,19 @@ export class AppComponent {
 
   ngOnInit() {
     this.userService.on(BlueEvent.kLoggedIn, () => {
+      this.username = this.userService.getUser()?.name || "";
       this.navCtrl.navigateRoot(this.appPages[0].url);
     });
     this.userService.on(BlueEvent.kLoggedOut, () => {
+      this.username = "--";
       this.navCtrl.navigateRoot("/login");
     });
 
     if (!this.loggedIn()) {
+      this.username = "--";
       this.navCtrl.navigateRoot("login");
+    } else {
+      this.username = this.userService.getUser()?.name || "";
     }
   }
 

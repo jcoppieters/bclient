@@ -33,10 +33,11 @@ export class HttpService  {
       const response = await call;
       
       if (response.headers) {
-        const token = response.headers.get("accessToken");
-        const expires = response.headers.get("expiresIn");
-        if (token && expires)
-          this.userService.setPermanent(token, expires);
+        //We don't need this (I think)
+        // const token = response.headers.get("accessToken");
+        // const expires = response.headers.get("expiresIn");
+        // if (token && expires)
+        //   this.userService.setToken(token, expires);
       }
 
       // console.log("HttpService.onlyBody -> body: " + JSON.stringify(response.body));
@@ -47,13 +48,17 @@ export class HttpService  {
 
       // authentication failed
       if (e.status === 401) {
-        // force log out
+        // ask new accessToken first 
+
+
+        // refreshToken has expired too -> force log out
         this.logout();
         // redirect to login
         console.log("HttpService.onlyBody -> 401 response -> logout & redirect to login page");
         await this.router.navigateByUrl("/login");
         return {status: ServerStatus.kNOK, message: "Session expired or wrong credentials", code: "authentication failed"}
       }
+
       return { message: e.statusText, code: e.statusText, ...e, status: ServerStatus.kError};
     }
 
@@ -70,9 +75,9 @@ export class HttpService  {
 
   headers() {
     const h = {"Cache-Control": "no-cache, no-store"};
-    const token = this.userService.getToken();
+    const token = this.userService.getIdToken();
     if (token) 
-      h["Authorization"] = "bearer " + token
+      h["Authorization"] = "bearer " + token.getJwtToken();
     return h;
   }
 

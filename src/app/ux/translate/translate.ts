@@ -15,7 +15,7 @@ export function getLanguage(): string {
   if (gLanguage) return gLanguage;
 
   try {
-    const user = JSON.parse(localStorage.getItem("USER")) as User;
+    const user = JSON.parse(localStorage.getItem("BLUE.USER")) as User;
     gLanguage = user?.language || gDeviceLanguage || "EN";
   } catch(e) {
     gLanguage = gDeviceLanguage || "EN";
@@ -24,7 +24,7 @@ export function getLanguage(): string {
   return gLanguage;
 }
 
-export function setLanguage(language?: string) {
+export function setLanguage(language?: string): string {
   if ("EN,NL,FR".indexOf(language) >= 0) {
     gLanguage = language;
   } else {
@@ -32,13 +32,14 @@ export function setLanguage(language?: string) {
   }
   let user = {} as User;
   try {
-    user = JSON.parse(localStorage.getItem("USER"));
+    user = JSON.parse(localStorage.getItem("BLUE.USER"));
   } catch(e) {
   }
   user.language = gLanguage;
-  localStorage.setItem("USER", JSON.stringify(user));
+  localStorage.setItem("BLUE.USER", JSON.stringify(user));
 
   console.log("*** changed language to " + gLanguage);
+  return gLanguage;
 }
 
 

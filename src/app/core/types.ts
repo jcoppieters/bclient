@@ -1,6 +1,8 @@
 export type Id = number;
 export type Char = string;
 export enum YN { kNo = "N", kYes = "Y" };
+export type Timer = ReturnType<typeof setTimeout>;
+
 
 export enum ServerStatus { kOK = "OK", kNOK = "NOK", kError = "ERROR"}
 
