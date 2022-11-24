@@ -14,8 +14,19 @@
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong class="capitalize">{{ module+".title" |_ }}</strong>
-    <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <ion-searchbar #searchInput (ionChange)="searchChanged($event)" [debounce]="500"></ion-searchbar>
+
+  <ion-list>
+    <ion-card *ngFor="let client of clients">
+      <ion-card-header>
+        <ion-card-subtitle>{{client.person}}</ion-card-subtitle>
+        <ion-card-title>{{client.name}}</ion-card-title>
+      </ion-card-header>
+    
+      <ion-card-content>
+        {{client.address}}<br/>
+        {{client.city}}
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
 </ion-content>

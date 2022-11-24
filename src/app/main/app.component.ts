@@ -1,13 +1,16 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { BlueEvent, UserService } from '../auth/user.service';
+import { UserEvent, User } from '../auth/user';
+
+console.log("app.component.ts");
+
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   public appPages = [
     { title: 'clients', url: '/module/clients', icon: 'people' },
     { title: 'offers', url: '/module/offers', icon: 'document' },
@@ -21,34 +24,39 @@ export class AppComponent {
     { title: 'reminders', url: "", icon: 'bookmark'}
   ];
 
-  constructor(private userService: UserService, 
+  constructor(private user: User, 
               private navCtrl: NavController) {  
   }
 
   ngOnInit() {
-    this.userService.on(BlueEvent.kLoggedIn, () => {
-      this.username = this.userService.getUser()?.name || "";
+    console.log("AppComponent.ngOnInit");
+
+    this.user.on(UserEvent.kLoggedIn, () => {
+      console.log("AppComponent.ngOnInit -> kLoggedIn");
+      this.username = this.user.getUserData()?.name || "";
       this.navCtrl.navigateRoot(this.appPages[0].url);
     });
-    this.userService.on(BlueEvent.kLoggedOut, () => {
+
+    this.user.on(UserEvent.kLoggedOut, () => {
+      console.log("AppComponent.ngOnInit -> kLoggedOut");
       this.username = "--";
       this.navCtrl.navigateRoot("/login");
     });
 
     if (!this.loggedIn()) {
       this.username = "--";
-      this.navCtrl.navigateRoot("login");
+      this.navCtrl.navigateRoot("/login");
     } else {
-      this.username = this.userService.getUser()?.name || "";
+      this.username = this.user.getUserData()?.name || "";
     }
   }
 
   public loggedIn(): boolean {
-    return this.userService.isLoggedIn();
+    return this.user.isLoggedIn();
   }
 
   public doLogout() {
-    this.userService.logout();
+    this.user.logout();
   }
 
 }
