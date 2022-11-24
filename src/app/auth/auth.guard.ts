@@ -1,19 +1,21 @@
 import { Injectable } from "@angular/core";
 import { CanActivate, Router, UrlTree } from "@angular/router";
-import { UserService } from "./user.service";
+import { User } from "./user";
+
+console.log("auth.guard.ts");
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private userService: UserService, 
+  constructor(private user: User, 
               private router: Router) {
     console.log("AuthGuard.constructor");
   }
 
   async canActivate(): Promise<boolean | UrlTree> {
-    const loggedIn = this.userService.isLoggedIn();
+    const loggedIn = this.user.isLoggedIn();
     console.log("AuthGuard.CanActivate -> loggedIn: " + loggedIn);
 
     if (loggedIn) {

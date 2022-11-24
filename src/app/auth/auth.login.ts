@@ -1,25 +1,25 @@
 import { Injectable } from "@angular/core";
 import { CanActivate, CanLoad, Router, UrlTree } from "@angular/router";
-import { UserService } from "./user.service";
+import { User } from "./user";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutoLogin implements CanLoad, CanActivate {
 
-  constructor(private userService: UserService,
+  constructor(private user: User,
               private router: Router) {
     console.log("AutoLogin.constructor");
   }
 
   async canLoad(): Promise<boolean | UrlTree> {
-    console.log("AutoLogin.canLoad -> token: " + this.userService.getToken());
+    console.log("AutoLogin.canLoad -> id-token: " + this.user.getIdToken());
 
-    const loggedIn = this.userService.isLoggedIn();    
-    console.log("AutoLogin.canLoad -> returns: " + ! this.userService.isLoggedIn());
+    const loggedIn = this.user.isLoggedIn();    
+    console.log("AutoLogin.canLoad -> returns: " + ! loggedIn);
 
     if (loggedIn) {
-      return this.router.createUrlTree(['/tabs']);
+      return !! this.router.createUrlTree(['/tabs']);
       
     } else {
       return true;

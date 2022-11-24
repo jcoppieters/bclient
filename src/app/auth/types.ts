@@ -29,14 +29,14 @@ export const kEmptySettings = {
 };
 
 
-export interface User {
+export interface UserData {
   id?: number;
   name: string;
   email: string;
   settings: Settings;
   language: string;
   phone: string;
-  username?: string;  // Cognito
+  username?: string;  // Cognito UID
 }
 export const kEmptyUser = { 
   name: "", email: "", phone: "",
@@ -65,18 +65,18 @@ export interface UserForgot {
 
 
 export interface AuthResponse extends ServerResponse {
-  user: User
+  user: UserData
   token: string;
   expires: number;
 }
 
 export interface UserResponse extends ServerResponse {
-  user: User;
+  user: UserData;
 }
 
 
 
-export function settings(user: User): Settings {
+export function settings(user: UserData): Settings {
   // check if settings are there or already json-parsed
   if (typeof user.settings === "string") {
     try {

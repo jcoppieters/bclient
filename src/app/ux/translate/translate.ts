@@ -1,4 +1,5 @@
-         import { User } from "src/app/auth/types";
+import { UserData } from "src/app/auth/types";
+import { environment } from '../../../environments/environment';
 import { translations } from "../../../app.translations";
 import { Device } from '@capacitor/device';
 
@@ -15,7 +16,7 @@ export function getLanguage(): string {
   if (gLanguage) return gLanguage;
 
   try {
-    const user = JSON.parse(localStorage.getItem("BLUE.USER")) as User;
+    const user = JSON.parse(localStorage.getItem(environment.name + ".USER")) as UserData;
     gLanguage = user?.language || gDeviceLanguage || "EN";
   } catch(e) {
     gLanguage = gDeviceLanguage || "EN";
@@ -30,13 +31,13 @@ export function setLanguage(language?: string): string {
   } else {
     gLanguage = "XX"
   }
-  let user = {} as User;
+  let user = {} as UserData;
   try {
-    user = JSON.parse(localStorage.getItem("BLUE.USER"));
+    user = JSON.parse(localStorage.getItem(environment.name + ".USER"));
   } catch(e) {
   }
   user.language = gLanguage;
-  localStorage.setItem("BLUE.USER", JSON.stringify(user));
+  localStorage.setItem(environment.name + ".USER", JSON.stringify(user));
 
   console.log("*** changed language to " + gLanguage);
   return gLanguage;

@@ -59,6 +59,8 @@ export const translations = {
       'login.doConfirmPassword': 'Bevestig je wachtwoord',
       'login.doConfirmEmail': 'Bevestig je email adres',
       'login.willSend': 'We versturen U hiervoor een code per email, wacht even, leun rustig achterover en ontspan',
+      'login.doWait': 'Geef het even de tijd, kijk ook eens in uw spam/junk mail map van Uw mail programma.',
+      'login.doAskNewCode': 'Vraag een nieuwe code',
       'login.authenticating': 'Aanmelden...',
 
     'settings.title': 'Instellingen',
@@ -77,7 +79,7 @@ export const translations = {
   },
 
   'EN': {
-    'global.app': 'BooLi',
+    'global.app': 'Blue',
     'global.sorry': 'Our apologies',
     'global.error': 'An error',
     'global.save': 'Save',
@@ -135,6 +137,8 @@ export const translations = {
       'login.doForgot': 'Reset my password',
       'login.doConfirmPassword': 'Confirm your password',
       'login.doConfirmEmail': 'Confirm Your Email Address',
+      'login.doWait': 'Give it some time, also check your spam/junk mail folder of your mail program.',
+      'login.doAskNewCode': 'Ask a new code',
       'login.willSend': 'We will send you a code for this by email, wait a moment, sit back and relax',
       'login.authenticating': 'Authenticating...',
 
@@ -155,7 +159,7 @@ export const translations = {
   },
 
   'FR': {
-    'global.app': 'BooLi',
+    'global.app': 'Blue',
     'global.sorry': 'Nos excuses',
     'global.error': 'Ene erreur',
     'global.save': 'Sauver',
@@ -212,7 +216,9 @@ export const translations = {
       'login.doLogin': 'Connecter',
       'login.doForgot': 'Réinitialiser mon mot de passe',
       'login.doConfirmPassword': 'Confirmer votre mot de passe',
-      'login.doConfirmEmail': 'confirmez votre adresse email',
+      'login.doConfirmEmail': 'Confirmez votre adresse email',
+      'login.doAskNewCode': 'Demander un nouveau code',
+      'login.doWait': 'Donnez-nous un peu de temps, vérifiez également votre dossier spam/courrier indésirable de votre programme de messagerie.',
       'login.willSend': 'Nous vous enverrons un code pas email, attendez un instant, asseyez-vous et détendez-vous',
       'login.authenticating': 'Se connecter...',
 
@@ -229,6 +235,5 @@ export const translations = {
         'settings.leaveEmpty': 'Ne remplisser que quand vous voulez changer votre mot de passe',
         'settings.forgetme': 'Oubliez moi',
         'settings.reallyforget': 'Ceci effacera complètement vos livres et votre compte, sans retour en arrière possible!'
-
   }
 };

@@ -2,8 +2,8 @@ import { AfterViewInit, ChangeDetectorRef, Component, ViewChild } from '@angular
 import { Router } from '@angular/router';
 import { AlertController, IonInput, NavController } from '@ionic/angular';
 
-import { AuthService } from '../auth/auth.service';
-import { BlueEvent, UserService } from '../auth/user.service';
+import { AuthService, awsPhone } from '../auth/auth.service';
+import { UserEvent, User } from '../auth/user';
 import { ServerStatus } from '../core/types';
 import { doAlert, doError } from '../ux/ux';
 import { getLanguage, setLanguage, _ } from '../ux/translate/translate';
@@ -41,23 +41,22 @@ export class LoginPage implements AfterViewInit {
   @ViewChild('phoneRef') phoneInput: IonInput;
 
   constructor(private authService: AuthService, 
-              private navCtrl: NavController, 
               private router: Router,
               private ref: ChangeDetectorRef,
               private alertCtrl: AlertController,
-              private userService: UserService) {
+              private user: User) {
 
-    const user = this.userService.getUser();
-    this.email = user.email || "";
+    const userData = this.user.getUserData();
+    this.email = userData.email || "";
     this.password = "";
-    this.name = user.name || "";   
-    this.phone = user.phone || "";   
+    this.name = userData.name || "";   
+    this.phone = userData.phone || "";   
     this.code = "";   
     
     this.language = getLanguage();
-    this.current = (user?.email) ? "login" : "register";
+    this.current = (userData?.email) ? "login" : "register";
 
-    if (this.userService.isLoggedIn()) {
+    if (this.user.isLoggedIn()) {
       console.log("LoginPage.constructor -> isLoggedIn = true -> redirect")
       this.router.navigateByUrl('/module', { replaceUrl: true })
     } else {
@@ -101,7 +100,7 @@ export class LoginPage implements AfterViewInit {
   ///////////////////////////
   changed() {
     this.nameOK = (this.name.length >= 4);
-    this.passwordOK = (this.password.length >= 8);
+    this.passwordOK = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\^$*.[\]{}()?"!@#%&/\\,><':;|_~`=+\- ])[A-Za-z0-9^$*.[\]{}()?"!@#%&/\\,><':;|_~`=+\- ]{8,256}$/.test(this.password);
     this.codeOK = (this.code.length === 6);
     this.phoneOK = (this.phone.length >= 10);
     this.emailOK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
@@ -115,6 +114,10 @@ export class LoginPage implements AfterViewInit {
   confirmEmailOK(): boolean {
     this.changed();
     return this.emailOK && this.codeOK;
+  }
+  confirmResendOK(): boolean {
+    this.changed();
+    return this.emailOK;
   }
   confirmPasswordOK(): boolean {
     this.changed();
@@ -138,11 +141,8 @@ export class LoginPage implements AfterViewInit {
     if (this.loginOK()) {
       const resp = await this.authService.login(this.email, this.password);
       console.log("LoginPage.login -> authService.login response: ", resp);
-      if (resp.status === ServerStatus.kOK) {
-        this.userService.signal(BlueEvent.kLoggedIn);
-        this.navCtrl.navigateRoot('module');
 
-      } else {
+      if (resp.status != ServerStatus.kOK) {
         doError(this.alertCtrl, resp.message);
       }
     }
@@ -150,10 +150,11 @@ export class LoginPage implements AfterViewInit {
 
   async register() {
     if (this.registerOK()) {
+      this.phone = awsPhone(this.phone);
       const user: UserRegister = {
         email: this.email, password: this.password, 
         name: this.name, language: this.language, 
-        phone: ""
+        phone: this.phone
       };
       const resp = await this.authService.register(user);
       console.log("LoginPage.register -> authService.register response: ", resp);
@@ -233,6 +234,7 @@ export class LoginPage implements AfterViewInit {
 
   async askEmailVerificationCode() {
     doAlert(this.alertCtrl, "Not implemented yet, sorry.");
+    this.changeCurrent("confirmEmail");
   }
 
 }

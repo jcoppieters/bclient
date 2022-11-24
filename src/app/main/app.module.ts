@@ -9,9 +9,6 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { UXModule } from '../ux/ux.module';
 
-import { HttpService } from '../core/httpService';
-import { AuthService } from '../auth/auth.service';
-import { UserService } from '../auth/user.service';
 import { LoginPageModule } from '../login/login.module';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -31,7 +28,7 @@ const setModeViaQueryparam = (): Mode | undefined => {
   imports: [BrowserModule, HttpClientModule, AppRoutingModule,  UXModule,
             LoginPageModule, 
             IonicModule.forRoot({ backButtonText: '', mode: setModeViaQueryparam() })],
-  providers: [HttpService, AuthService, UserService, 
+  providers: [
               { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })

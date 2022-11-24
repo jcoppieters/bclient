@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AuthenticationDetails, CodeDeliveryDetails, CognitoAccessToken, CognitoIdToken, CognitoRefreshToken, CognitoUser, CognitoUserAttribute, CognitoUserPool, CognitoUserSession, ISignUpResult } from 'amazon-cognito-identity-js';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 import { HttpService } from '../core/httpService';
 import { ServerResponse, ServerStatus } from '../core/types';
-import { AuthResponse, UserRegister, User, UserResponse } from './types';
+import { AuthResponse, UserRegister, UserData, UserResponse } from './types';
 
 export interface ILoginUser {
   email: string;
@@ -11,15 +11,21 @@ export interface ILoginUser {
   name: string;
   phone: string;
 }
+
 const poolData = {
   UserPoolId: environment.cognito.userPoolId, 
   ClientId: environment.cognito.userPoolClientId
 };
-const userPool = new CognitoUserPool(poolData);
+export const userPool = new CognitoUserPool(poolData);
 const blueAttributes = ["name", "email", "phone_number", "locale"];
 
-function awsPhone(phone:string): string {
-  return "+" + phone.replace("+", "").replace(/^00/, "").replace(/[^0-9]+/g, "");
+export function awsPhone(phone:string): string {
+  if (!phone) return "";
+
+  phone = phone.replace("+", "").replace(/^00/, "").replace(/[^0-9]+/g, "");
+  if (phone.charAt(0) != '0') phone = "+" + phone;
+  
+  return phone;
 }
 
 @Injectable({
@@ -29,9 +35,9 @@ export class AuthService extends HttpService {
 
   async resetPassword(email: string): Promise<ServerResponse> {
     return new Promise((resolve, reject) => {
-      const cuser = new CognitoUser({Username: email, Pool: userPool});
+      const cUser = new CognitoUser({Username: email, Pool: userPool});
 
-      cuser.forgotPassword({
+      cUser.forgotPassword({
         onSuccess: (data) => {
           // I don't think we get here...
           console.log("AuthService.forgot -> success: ", data);
@@ -50,9 +56,9 @@ export class AuthService extends HttpService {
   }
   async confirmPassword(email: string, code: string, password: string): Promise<ServerResponse> {
     return new Promise((resolve, reject) => {
-      const cuser = new CognitoUser({Username: email, Pool: userPool});
+      const cUser = new CognitoUser({Username: email, Pool: userPool});
 
-      cuser.confirmPassword(code, password, {
+      cUser.confirmPassword(code, password, {
         onSuccess: (data) => {
           console.log("AuthService.newPassword -> success: ", data);
 
@@ -76,14 +82,15 @@ export class AuthService extends HttpService {
       userPool.signUp(user.email, user.password, attributes, [], (err, result: ISignUpResult) => {
         if (err) {
           console.log("AuthService.register -> error registering", err);
-          reject(err);
+          resolve({status: ServerStatus.kNOK, message: err.message});
 
         } else {
           // already remember the user, but no token yet
-          this.userService.setUser({email: user.email, language: user.language, name: user.name});
+          this.user.setUserData({email: user.email, language: user.language, name: user.name});
 
-          // create the user in the database, ignore if failed???
-          this.createDBUser(user.email, false, user.name, user.language)
+          // create the user in the database, ignore if failed??? 
+          //TODO -> partial registration -> delete in Cognito?
+          this.registerDBUser(user.email, user.name, user.language, user.phone)
             .then(result => resolve(result))
             .catch(err => resolve({status: ServerStatus.kOK, message: result.codeDeliveryDetails.AttributeName}));
         }
@@ -94,13 +101,13 @@ export class AuthService extends HttpService {
 
   async confirmEmail(email: string, code: string): Promise<ServerResponse> {
     return new Promise((resolve, reject) => {
-      const user = new CognitoUser({Username: email, Pool: userPool});
+      const cUser = new CognitoUser({Username: email, Pool: userPool});
 
-      user.confirmRegistration(code, true, (err, result) => {
+      cUser.confirmRegistration(code, true, (err, result) => {
         if (err) {
           resolve({status: ServerStatus.kNOK, message: err.message})
         } else {
-          this.createDBUser(email, true)
+          this.verifyDBUser(email)
             .then(result => resolve(result))
             .catch(err => resolve({status: ServerStatus.kOK, message: result.codeDeliveryDetails.AttributeName}));
         }
@@ -129,7 +136,7 @@ export class AuthService extends HttpService {
           const idToken: CognitoIdToken = result.getIdToken();
           const refreshToken: CognitoRefreshToken = result.getRefreshToken();
 
-          this.userService.storeTokens(idToken, accessToken, refreshToken);
+          this.user.login(idToken, accessToken, refreshToken);
 
           // ask our server for more client details based on the access-token
           // DB operation uses current token
@@ -152,18 +159,26 @@ export class AuthService extends HttpService {
     });
   }
 
-  async user(): Promise<AuthResponse> {
+  async logout(): Promise<void> {
+    let cognitoUser = userPool.getCurrentUser();
+    cognitoUser?.signOut(() => {
+      this.user.logout();
+    });
+  }
+
+
+  async getUser(): Promise<AuthResponse> {
     try {
       const serverResponse = await this.getDBUser();
       if (serverResponse.status === ServerStatus.kOK) {
         console.log("AuthService.getUser -> Authenticated by Server: ", serverResponse);
-        this.userService.setUser(serverResponse.user);
+        this.user.setUserData(serverResponse.user);
 
-        const idToken: CognitoIdToken = this.userService.getIdToken();
+        const idToken: CognitoIdToken = this.user.getIdToken();
         const token = idToken.getJwtToken();
         const expires = idToken.getExpiration();
 
-        return {status: serverResponse.status, user: serverResponse.user as User, token, expires};
+        return {status: serverResponse.status, user: serverResponse.user as UserData, token, expires};
 
       } else {
         return {...serverResponse, user: null, token: "", expires: 0}; 
@@ -174,14 +189,6 @@ export class AuthService extends HttpService {
       return {status: ServerStatus.kError, user: null, token: "", expires: 0, message: e.message}
     }
   }
-
-  async logout(): Promise<void> {
-    let cognitoUser = userPool.getCurrentUser();
-    cognitoUser?.signOut(() => {
-      this.userService.logout();
-    });
-  }
-
 
     /*
 CognitoUserSession
@@ -244,7 +251,7 @@ CognitoUserSession
     });
   }
 
-  async update(user: User): Promise<ServerResponse> {
+  async update(user: UserData): Promise<ServerResponse> {
     if (user.phone) user.phone = awsPhone(user.phone);
     const cognitoUser = userPool.getCurrentUser();
 
@@ -276,7 +283,7 @@ CognitoUserSession
           resolve({status: ServerStatus.kError, message: err.message});
 
         } else {
-          this.eraseDBUser()
+          this.deleteDBUser()
             .then( resp => resolve(resp))
             .catch( err => resolve({status: ServerStatus.kError, message: err.message}) );
         }
@@ -287,20 +294,24 @@ CognitoUserSession
   //////////////////
   // server stuff //
   //////////////////
-  async createDBUser(email: string, verified: boolean, name?: string, language?: string): Promise<ServerResponse> {
+  async registerDBUser(email: string, name: string, language: string, phone: string): Promise<ServerResponse> {
     try {
-      const user = {email, verified};
-      if (name) user["name"] = name;
-      if (language) user["language"] = language;
-      
-      return this.post("/auth/user", user);
+      return this.post("/auth/register", {user: {email, name, language, phone}});
+
+    } catch(err) {
+      return {status: ServerStatus.kError, message: err.message}
+    }
+  }
+  async verifyDBUser(email: string): Promise<ServerResponse> {
+    try {
+      return this.post("/auth/verify", {email});
 
     } catch(err) {
       return {status: ServerStatus.kError, message: err.message}
     }
   }
 
-  async updateDBUser(user: User): Promise<UserResponse> {
+  async updateDBUser(user: UserData): Promise<UserResponse> {
     return <Promise<UserResponse>> this.patch("/auth/update", {user});
   }
 
@@ -309,7 +320,7 @@ CognitoUserSession
     return <Promise<UserResponse>> this.get("/auth/user");
   }
 
-  async eraseDBUser(): Promise<ServerResponse> {
+  async deleteDBUser(): Promise<ServerResponse> {
     // delete from server
     return <Promise<ServerResponse>> this.delete("/auth/user");
   }

@@ -87,7 +87,10 @@
       <ion-button expand="block" (click)="confirmEmail()" [disabled]="! confirmEmailOK()" *ngIf="current === 'confirmEmail'">
         {{ "login.doConfirmEmail" |_ }}
       </ion-button>
-      <ion-button expand="block" (click)="askEmailVerificationCode()" [disabled]="! confirmEmailOK()" *ngIf="current === 'confirmEmail'">
+
+      <ion-note *ngIf="current === 'confirmEmail'">{{ "login.doWait" |_ }}</ion-note>
+
+      <ion-button expand="block" (click)="askEmailVerificationCode()" [disabled]="! confirmResendOK()" *ngIf="current === 'confirmEmail'">
         {{ "login.doAskNewCode" |_ }}
       </ion-button>
 
