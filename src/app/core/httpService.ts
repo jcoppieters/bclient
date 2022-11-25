@@ -34,12 +34,13 @@ export class HttpService  {
       return response.body;
 
     } catch(e) {
-      console.log("HttpService.onlyBody -> error: " + JSON.stringify(e));
+      console.log("HttpService.executor -> error: " + JSON.stringify(e));
 
       // authentication failed
       if (e.status === 401) {
         try {
           // try to ask new accessToken and re-execute the call (headers will be reconstructed)
+          console.log("HttpService.executor -> Received 401 -> get new token")
           await this.getNewIdToken();
           const response = await call();
 
@@ -58,7 +59,7 @@ export class HttpService  {
           } else {
             // normal call failure after second try
             console.log("HttpService.executor (2) -> " + e.statusText + " response -> ", e);
-            return { message: e.statusText, code: e.statusText, ...e, status: ServerStatus.kError};
+            return { message: e.message, code: e.statusText, ...e, status: ServerStatus.kError};
           }
         }
 
@@ -81,6 +82,7 @@ export class HttpService  {
           console.log("HttpService.getNewIdToken -> Error: ", err);
           reject(err);
         } else {
+          console.log("HttpService.getNewIdToken -> id token: ", session.idToken)
           // call "storeTokens", not "login", we don't want to alert the rest of the application
           this.user.storeTokens(session.idToken, session.accessToken, session.refreshToken)
           resolve(session.idToken);
