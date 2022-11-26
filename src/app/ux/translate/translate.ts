@@ -1,14 +1,15 @@
-import { UserData } from "src/app/auth/types";
+import { UserData } from "../../auth/types";
 import { environment } from '../../../environments/environment';
 import { translations } from "../../../app.translations";
 import { Device } from '@capacitor/device';
+import logger from "../../core/logger";
 
 let gLanguage;
 let gDeviceLanguage;
 
 Device.getLanguageCode().then(value => {
   gDeviceLanguage = value?.value?.toUpperCase().substring(0, 2);
-  console.log("setting deviceLanguage to: " + gDeviceLanguage)
+  logger.log("app", "setting deviceLanguage to: " + gDeviceLanguage)
 });
 
 
@@ -39,7 +40,7 @@ export function setLanguage(language?: string): string {
   user.language = gLanguage;
   localStorage.setItem(environment.name + ".USER", JSON.stringify(user));
 
-  console.log("*** changed language to " + gLanguage);
+  logger.log("app", "*** changed language to " + gLanguage);
   return gLanguage;
 }
 

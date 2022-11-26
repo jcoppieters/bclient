@@ -3,9 +3,10 @@ import { CognitoAccessToken, CognitoIdToken, CognitoRefreshToken } from "amazon-
 import * as EventEmitter from "events";
 import { kEmptyUser, settings, UserData } from "./types";
 import { environment } from '../../environments/environment';
+import logger from "../core/logger";
 
 export enum UserEvent {kLoggedIn = "login", kLoggedOut = "logout"};
-console.log("user.ts");
+
 
 @Injectable({
   providedIn: 'root'
@@ -19,15 +20,14 @@ export class User {
   private refreshToken: CognitoRefreshToken = null;
   
   constructor() {
-    console.log("User.constructor -> start");
+    logger.log("user", "User.constructor -> start");
 
     this.setupEmitter();
 
     this.getUserData();
-    console.log("User.constructor -> after getUserData")
     this.fetchTokens();
 
-    console.log("User.constructor -> user/tokens: ", this.user);
+    logger.log("user", "User.constructor -> user/tokens: ", this.user);
   }
 
 
@@ -45,13 +45,13 @@ export class User {
   }
 
   public logout() {
-    console.log("User.logout");
+    logger.log("user", "User.logout");
     this.storeTokens(null, null, null);
     this.signal(UserEvent.kLoggedOut);
   }
 
   public login(idToken: CognitoIdToken, accessToken: CognitoAccessToken, refreshToken: CognitoRefreshToken) {
-    console.log("User.login");
+    logger.log("user", "User.login");
     this.storeTokens(idToken, accessToken, refreshToken);
     this.signal(UserEvent.kLoggedIn);
   }
@@ -117,7 +117,7 @@ export class User {
 
   // keep updated about changes
   on(action: UserEvent, listener: (...args: any[]) => void) {
-    console.log("adding listener");
+    logger.log("user", "adding listener");
     this.emitter.on(action, listener);
   }
   off(action: UserEvent, listener: (...args: any[]) => void) {
@@ -125,7 +125,7 @@ export class User {
   }
 
   signal(action: UserEvent, data?) {
-    console.log("User.signal -> ***" + action + "***");
+    logger.log("user", "User.signal -> ***" + action + "***");
     this.emitter.emit(action, data);
   }
 

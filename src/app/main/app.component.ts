@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { UserEvent, User } from '../auth/user';
-
-console.log("app.component.ts");
+import logger from '../core/logger';
 
 
 @Component({
@@ -29,16 +28,16 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log("AppComponent.ngOnInit");
+    logger.log("app", "AppComponent.ngOnInit");
 
     this.user.on(UserEvent.kLoggedIn, () => {
-      console.log("AppComponent.ngOnInit -> kLoggedIn");
+      logger.log("app", "AppComponent.ngOnInit -> kLoggedIn");
       this.username = this.user.getUserData()?.name || "";
       this.navCtrl.navigateRoot(this.appPages[0].url);
     });
 
     this.user.on(UserEvent.kLoggedOut, () => {
-      console.log("AppComponent.ngOnInit -> kLoggedOut");
+      logger.log("app","AppComponent.ngOnInit -> kLoggedOut");
       this.username = "--";
       this.navCtrl.navigateRoot("/login");
     });

@@ -4,26 +4,23 @@ import { CognitoIdToken, CognitoUser } from 'amazon-cognito-identity-js';
 import { environment } from '../../environments/environment';
 import { userPool } from '../auth/auth.service';
 import { User } from '../auth/user';
+import logger from './logger';
 import { ServerResponse, ServerStatus } from './types';
 
-console.log("httpService.ts");
+// Johan Coppieters //
+//
+// v1.0 - nov 2022 - use id token for each call
+// v1.1 - nov 2022 - on first 401 response, try to refresh the id token and re-execute the call once
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class HttpService  {
   url: string;
 
   constructor(private httpClient: HttpClient,
               protected user: User) {    
     
-    console.log("HttpService.constructor -> using: " + environment.server + ", logged in: " + this.isLoggedIn());
+    logger.log("http", "HttpService.constructor -> using: " + environment.server + ", logged in: " + this.user.isLoggedIn());
     this.use(environment.server);
-  }
-
-
-  isLoggedIn(): boolean {
-    return this.user.isLoggedIn();
   }
 
   async executor(call: () => Promise<any>): Promise<ServerResponse> {
