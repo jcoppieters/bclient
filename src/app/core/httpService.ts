@@ -4,7 +4,7 @@ import { CognitoIdToken, CognitoUser } from 'amazon-cognito-identity-js';
 import { environment } from '../../environments/environment';
 import { userPool } from '../auth/auth.service';
 import { User } from '../auth/user';
-import logger from './logger';
+import logger, { LogLevel } from './logger';
 import { ServerResponse, ServerStatus } from './types';
 
 // Johan Coppieters //
@@ -19,6 +19,7 @@ export class HttpService  {
   constructor(private httpClient: HttpClient,
               protected user: User) {    
     
+    logger.setLogLevel("http", LogLevel.debug)
     logger.log("http", "HttpService.constructor -> using: " + environment.server + ", logged in: " + this.user.isLoggedIn());
     this.use(environment.server);
   }
@@ -27,21 +28,21 @@ export class HttpService  {
     try {
       const response = await call();
 
-      // console.log("HttpService.executor (1) -> body: " + JSON.stringify(response.body));
+      // logger.log("http", "HttpService.executor (1) -> body: " + JSON.stringify(response.body));
       return response.body;
 
     } catch(e) {
-      console.log("HttpService.executor -> error: " + JSON.stringify(e));
+      logger.log("http", "HttpService.executor -> error: " + JSON.stringify(e));
 
       // authentication failed
       if (e.status === 401) {
         try {
           // try to ask new accessToken and re-execute the call (headers will be reconstructed)
-          console.log("HttpService.executor -> Received 401 -> get new token")
-          await this.getNewIdToken();
+          logger.log("http", "HttpService.executor -> Received 401 -> get new token")
+          await this.getNewAccessToken();
           const response = await call();
 
-          // console.log("HttpService.executor (2) -> body: " + JSON.stringify(response.body));
+          // logger.log("http", "HttpService.executor (2) -> body: " + JSON.stringify(response.body));
           return response.body;
 
         } catch(e) {
@@ -49,37 +50,37 @@ export class HttpService  {
           
           if (e.status === 401) {
             // either again: authentication failed -> logout in the UX too
-            console.log("HttpService.executor (2) -> 401 response -> logout & redirect to login page");
+            logger.log("http", "HttpService.executor (2) -> 401 response -> logout & redirect to login page");
             this.user.logout();
             return {status: ServerStatus.kNOK, message: "Session expired or wrong credentials"};
 
           } else {
             // normal call failure after second try
-            console.log("HttpService.executor (2) -> " + e.statusText + " response -> ", e);
+            logger.err("http", "HttpService.executor (2) -> " + e.statusText + " response -> ", e);
             return { message: e.message, code: e.statusText, ...e, status: ServerStatus.kError};
           }
         }
 
       } else {
         // normal call failure after first try
-        console.log("HttpService.executor (1) -> " + e.statusText + " response -> ", e);
+        logger.err("http", "HttpService.executor (1) -> " + e.statusText + " response -> ", e);
         return { message: e.statusText, code: e.statusText, ...e, status: ServerStatus.kError};
       }
 
     }
   }
 
-  async getNewIdToken(): Promise<CognitoIdToken> {
+  async getNewAccessToken(): Promise<CognitoIdToken> {
     const refreshToken = this.user.getRefreshToken();
     const cognitoUser = new CognitoUser({Username: this.user.getUserData()?.email || "", Pool: userPool});
 
     return new Promise( (resolve, reject) => {
       cognitoUser.refreshSession(refreshToken, (err, session) => {
         if (err) {
-          console.log("HttpService.getNewIdToken -> Error: ", err);
+          logger.err("http", "HttpService.getNewAccessToken -> Error: ", err);
           reject(err);
         } else {
-          console.log("HttpService.getNewIdToken -> id token: ", session.idToken)
+          logger.log("http", "HttpService.getNewAccessToken -> access token: ", session.accessToken);
           // call "storeTokens", not "login", we don't want to alert the rest of the application
           this.user.storeTokens(session.idToken, session.accessToken, session.refreshToken)
           resolve(session.idToken);
@@ -98,7 +99,7 @@ export class HttpService  {
 
   headers() {
     const h = {"Cache-Control": "no-cache, no-store"};
-    const token = this.user.getIdToken();
+    const token = this.user.getAccessToken();
     if (token) 
       h["Authorization"] = "bearer " + token.getJwtToken();
     return h;

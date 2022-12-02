@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AuthenticationDetails, CodeDeliveryDetails, CognitoAccessToken, CognitoIdToken, CognitoRefreshToken, CognitoUser, CognitoUserAttribute, CognitoUserPool, CognitoUserSession, ISignUpResult } from 'amazon-cognito-identity-js';
 import { environment } from '../../environments/environment';
 import { HttpService } from '../core/httpService';
+import logger from '../core/logger';
 import { ServerResponse, ServerStatus } from '../core/types';
 import { AuthResponse, UserRegister, UserData, UserResponse } from './types';
 
@@ -60,13 +61,13 @@ export class AuthService extends HttpService {
 
       cUser.confirmPassword(code, password, {
         onSuccess: (data) => {
-          console.log("AuthService.newPassword -> success: ", data);
+          logger.log("auth", "AuthService.newPassword -> success: ", data);
 
 
           resolve({status: ServerStatus.kOK})
         },
         onFailure: (err: Error) => {
-          console.log("AuthService.forgot -> failure: ", err);
+          logger.err("auth", "AuthService.forgot -> failure: ", err);
           resolve({status: ServerStatus.kNOK, message: err.message})
         }
       });
@@ -81,16 +82,19 @@ export class AuthService extends HttpService {
     return new Promise((resolve, reject) => {
       userPool.signUp(user.email, user.password, attributes, [], (err, result: ISignUpResult) => {
         if (err) {
-          console.log("AuthService.register -> error registering", err);
+          logger.err("auth", "AuthService.register -> error registering", err);
           resolve({status: ServerStatus.kNOK, message: err.message});
 
         } else {
           // already remember the user, but no token yet
-          this.user.setUserData({email: user.email, language: user.language, name: user.name});
+          logger.debug("auth", "AuthService.register -> SignUpResult: ", result);
+          const localUser = {email: user.email, language: user.language, name: user.name, 
+                             username: result.userSub};
+          this.user.setUserData(localUser);
 
           // create the user in the database, ignore if failed??? 
           //TODO -> partial registration -> delete in Cognito?
-          this.registerDBUser(user.email, user.name, user.language, user.phone)
+          this.registerDBUser(localUser)
             .then(result => resolve(result))
             .catch(err => resolve({status: ServerStatus.kOK, message: result.codeDeliveryDetails.AttributeName}));
         }
@@ -107,6 +111,7 @@ export class AuthService extends HttpService {
         if (err) {
           resolve({status: ServerStatus.kNOK, message: err.message})
         } else {
+          logger.debug("auth", "AuthService.confirmEmail -> confirmRegistration: ", result, cUser);
           this.verifyDBUser(email)
             .then(result => resolve(result))
             .catch(err => resolve({status: ServerStatus.kOK, message: result.codeDeliveryDetails.AttributeName}));
@@ -130,7 +135,7 @@ export class AuthService extends HttpService {
     return new Promise<AuthResponse | ServerResponse>((resolve, reject) => {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: (result: CognitoUserSession) => {
-          console.log("AuthService.login -> Authenticated by Cognito: ", result);
+          logger.debug("auth", "AuthService.login -> Authenticated by Cognito: ", result);
 
           const accessToken: CognitoAccessToken = result.getAccessToken();
           const idToken: CognitoIdToken = result.getIdToken();
@@ -147,12 +152,12 @@ export class AuthService extends HttpService {
         },
 
         newPasswordRequired(userAttributes, []) {
-          console.log("AuthService.login -> newPasswordRequired: ", userAttributes);
+          logger.debug("auth", "AuthService.login -> newPasswordRequired: ", userAttributes);
           cognitoUser.completeNewPasswordChallenge(password, {}, this);
         },
 
         onFailure: (err) => {
-          console.log("AuthService.authenticate -> Cognito error: " + err.message, err);
+          logger.err("auth", "AuthService.authenticate -> Cognito error: " + err.message, err);
           resolve(err)
         }
       });
@@ -165,13 +170,20 @@ export class AuthService extends HttpService {
       this.user.logout();
     });
   }
+  async globalLogout(): Promise<void> {
+    let cognitoUser = userPool.getCurrentUser();
+    cognitoUser?.globalSignOut({ 
+      onSuccess: (msg: string) => { this.user.logout(); },
+      onFailure: (err: Error)  => { logger.err("auth", "AuthService.globalLogout -> Cognitor error: " + err.message); }
+    });
+  }
 
 
   async getUser(): Promise<AuthResponse> {
     try {
       const serverResponse = await this.getDBUser();
       if (serverResponse.status === ServerStatus.kOK) {
-        console.log("AuthService.getUser -> Authenticated by Server: ", serverResponse);
+        logger.log("auth", "AuthService.getUser -> Authenticated by Server: ", serverResponse);
         this.user.setUserData(serverResponse.user);
 
         const idToken: CognitoIdToken = this.user.getIdToken();
@@ -185,7 +197,7 @@ export class AuthService extends HttpService {
       }
 
     } catch(e) {
-      console.log("AuthService.user -> Server error: ", e.message, e);
+      logger.err("auth", "AuthService.user -> Server error: ", e.message, e);
       return {status: ServerStatus.kError, user: null, token: "", expires: 0, message: e.message}
     }
   }
@@ -294,9 +306,9 @@ CognitoUserSession
   //////////////////
   // server stuff //
   //////////////////
-  async registerDBUser(email: string, name: string, language: string, phone: string): Promise<ServerResponse> {
+  async registerDBUser(user: Partial<UserData>): Promise<ServerResponse> {
     try {
-      return this.post("/auth/register", {user: {email, name, language, phone}});
+      return this.post("/auth/register", {user});
 
     } catch(err) {
       return {status: ServerStatus.kError, message: err.message}

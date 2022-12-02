@@ -7,8 +7,10 @@ export const environment = {
   production: false,
   server: "http://localhost:3002",
   cognito: {
-    userPoolId: "eu-central-1_vaYSfNyYz",
-    userPoolClientId: "3m9a0852e1fvgtmh89h5oke9jp"
+    userPoolId: "eu-central-1_uK3hlq0L6", // Blue-Test
+    userPoolClientId: "6f8fh3aqo9aoa1anir526gngr2" // Blue-Test
+    // userPoolId: "eu-central-1_vaYSfNyYz", // blue-cognito
+    // userPoolClientId: "3m9a0852e1fvgtmh89h5oke9jp" // blue-cognito
   }
 };
 
