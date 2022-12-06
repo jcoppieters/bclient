@@ -47,10 +47,10 @@ export class LoginPage implements AfterViewInit {
               private user: User) {
 
     const userData = this.user.getUserData();
-    this.email = userData.email || "";
+    this.email = userData?.email || "";
     this.password = "";
-    this.name = userData.name || "";   
-    this.phone = userData.phone || "";   
+    this.name = userData?.name || "";   
+    this.phone = userData?.phone || "";   
     this.code = "";   
     
     this.language = getLanguage();

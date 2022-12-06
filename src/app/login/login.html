@@ -16,7 +16,7 @@
       <ion-label>{{ "login.confirmEmail" |_ }}</ion-label>
     </ion-segment-button>
 
-    <ion-segment-button value="forgot" (click)="reFocus()">
+    <ion-segment-button value="forgot" (click)="reFocus()" *ngIf="current == 'login'">
       <ion-label>{{ "login.forgot" |_ }}</ion-label>
     </ion-segment-button>
 
