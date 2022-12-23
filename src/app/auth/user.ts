@@ -36,7 +36,8 @@ export class User {
     return this.idToken;
   }
   public getAccessToken(): CognitoAccessToken {
-    if (!this.accessToken) this.fetchTokens();
+    //if (!this.accessToken)
+     this.fetchTokens();
     return this.accessToken;
   }
   public getRefreshToken(): CognitoRefreshToken {

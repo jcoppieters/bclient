@@ -30,7 +30,7 @@ export class LoginPage implements AfterViewInit {
   email: string;      emailOK: boolean;
   password: string;   passwordOK: boolean;
   phone: string;      phoneOK: boolean;
-  name: string;       nameOK: boolean;
+  fullname: string;   fullnameOK: boolean;
   code: string;       codeOK: boolean;
 
   language: string;
@@ -49,7 +49,7 @@ export class LoginPage implements AfterViewInit {
     const userData = this.user.getUserData();
     this.email = userData?.email || "";
     this.password = "";
-    this.name = userData?.name || "";   
+    this.fullname = userData?.fullname || "";   
     this.phone = userData?.phone || "";   
     this.code = "";   
     
@@ -99,7 +99,7 @@ export class LoginPage implements AfterViewInit {
   // Changes - validations //
   ///////////////////////////
   changed() {
-    this.nameOK = (this.name.length >= 4);
+    this.fullnameOK = (this.fullname.length >= 4);
     this.passwordOK = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\^$*.[\]{}()?"!@#%&/\\,><':;|_~`=+\- ])[A-Za-z0-9^$*.[\]{}()?"!@#%&/\\,><':;|_~`=+\- ]{8,256}$/.test(this.password);
     this.codeOK = (this.code.length === 6);
     this.phoneOK = (this.phone.length >= 10);
@@ -109,7 +109,7 @@ export class LoginPage implements AfterViewInit {
   // and "OK" for each action
   registerOK(): boolean {
     this.changed();
-    return this.emailOK && this.nameOK && this.passwordOK; // && this.phoneOK;
+    return this.emailOK && this.fullnameOK && this.passwordOK; // && this.phoneOK;
   }
   confirmEmailOK(): boolean {
     this.changed();
@@ -153,7 +153,7 @@ export class LoginPage implements AfterViewInit {
       this.phone = awsPhone(this.phone);
       const user: UserRegister = {
         email: this.email, password: this.password, 
-        name: this.name, language: this.language, 
+        fullname: this.fullname, language: this.language, 
         phone: this.phone
       };
       const resp = await this.authService.register(user);

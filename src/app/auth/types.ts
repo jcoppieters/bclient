@@ -31,21 +31,21 @@ export const kEmptySettings = {
 
 export interface UserData {
   id?: number;
-  name: string;
+  fullname: string;
   email: string;
   settings: Settings;
   language: string;
   phone: string;
   username?: string;  // Cognito UID
 }
-export const kEmptyUser = { 
-  name: "", email: "", phone: "",
+export const kEmptyUser: UserData = { 
+  fullname: "", email: "", phone: "",
   settings: {...kEmptySettings}, 
   language: "EN"
 };
 
 export interface UserRegister {
-  name: string;
+  fullname: string;
   email: string;
   password: string;
   language: string;
@@ -89,6 +89,8 @@ export function settings(user: UserData): Settings {
   // set default while upgrading user pref records
   if (!user.settings) 
     user.settings = {...kEmptySettings};
+  if (!user.settings.tabs)
+    user.settings.tabs = {};
 
   // be sure to have all tabs so we can auto-add tabs later in the user settings
   const tabs = {};

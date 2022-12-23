@@ -32,7 +32,7 @@ export class AppComponent implements OnInit {
 
     this.user.on(UserEvent.kLoggedIn, () => {
       logger.log("app", "AppComponent.ngOnInit -> kLoggedIn");
-      this.username = this.user.getUserData()?.name || "";
+      this.username = this.user.getUserData()?.fullname || "";
       this.navCtrl.navigateRoot(this.appPages[0].url);
     });
 
@@ -46,7 +46,7 @@ export class AppComponent implements OnInit {
       this.username = "--";
       this.navCtrl.navigateRoot("/login");
     } else {
-      this.username = this.user.getUserData()?.name || "";
+      this.username = this.user.getUserData()?.fullname || "";
     }
   }
 

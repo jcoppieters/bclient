@@ -19,13 +19,14 @@
   <ion-list>
     <ion-card *ngFor="let client of clients">
       <ion-card-header>
-        <ion-card-subtitle>{{client.person}}</ion-card-subtitle>
+        <ion-card-subtitle>{{client.id}}. {{client.email}} (verified={{client.verified}})</ion-card-subtitle>
         <ion-card-title>{{client.name}}</ion-card-title>
       </ion-card-header>
     
       <ion-card-content>
-        {{client.address}}<br/>
-        {{client.city}}
+        Phone: {{client.phone}}<br/>
+        Created: {{client.created}}<br/>
+        Language: {{client.language}}
       </ion-card-content>
     </ion-card>
   </ion-list>

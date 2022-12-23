@@ -3,17 +3,27 @@ export type Char = string;
 export enum YN { kNo = "N", kYes = "Y" };
 export type Timer = ReturnType<typeof setTimeout>;
 
+export class ServerError extends Error {
+  status: number;
+  statusText: string;
+  constructor(message: string, status: number) {
+    super(message);
+    this.statusText = message;
+    this.status = status;
+  }
+}
 
 export enum ServerStatus { kOK = "OK", kNOK = "NOK", kError = "ERROR"}
 
 export interface ServerResponse {
   status: ServerStatus;
   message?: string;
-  code?: string;
+  code?: number;
   [key: string]: unknown;
 }
 
-export function makeNOKResponse(message: string, code = "", extras?: object): ServerResponse {
+
+export function makeNOKResponse(message: string, code: number, extras?: object): ServerResponse {
   return {status: ServerStatus.kNOK, message, code, ...extras};
 }
 

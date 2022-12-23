@@ -5,14 +5,28 @@
 export const environment = {
   name: "BLUE",
   production: false,
-  server: "http://localhost:3002",
+  //server: "http://localhost:9229/api",
+  server: "https://twjhebvbsh.execute-api.eu-central-1.amazonaws.com",
   cognito: {
-    userPoolId: "eu-central-1_uK3hlq0L6", // Blue-Test
-    userPoolClientId: "6f8fh3aqo9aoa1anir526gngr2" // Blue-Test
-    // userPoolId: "eu-central-1_vaYSfNyYz", // blue-cognito
-    // userPoolClientId: "3m9a0852e1fvgtmh89h5oke9jp" // blue-cognito
+    authenticationFlow: 'USER_PASSWORD_AUTH',
+
+    // Blue-local //
+    // endpoint: "http://localhost:9229",
+    // userPoolId: "local_5MhnM5Q5",
+    // userPoolClientId: "4f1sv0gs5c78mkacekxzzmu3a",
+    
+    // blue-user-pool //
+    userPoolId: "eu-central-1_XC0RZjrJz",
+    userPoolClientId: "jrlkj657vi4vun2rdfjc0uegg", // blue-client
+
   }
 };
+
+/* create the local pool:
+
+aws --endpoint http://localhost:9229 cognito-idp create-user-pool --pool-name blue-dev
+## edit ./cognito/db/xxx.json 
+aws --endpoint http://localhost:9229 cognito-idp create-user-pool-client --user-pool-id=local_5MhnM5Q5 --client-name=blue-local
 
 /*
  * For easier debugging in development mode, you can import the following file

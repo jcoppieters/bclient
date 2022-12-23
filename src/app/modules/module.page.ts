@@ -26,7 +26,7 @@ export class ModulePage implements OnInit {
       if (resp.status === ServerStatus.kOK) {
         this.clients = <any> resp.clients;
       } else {
-        this.clients = [{name: "Error !!", person: resp.code, address: resp.message}];
+        this.clients = [{name: "Error !!, code: " + resp.code + ", " + resp.message}];
       }
     }
   }

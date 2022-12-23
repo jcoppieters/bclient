@@ -1,4 +1,4 @@
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 export type LogFunction = (message?: any, ...optionalParams: any[]) => void;
 export enum LogLevel { noLog = 0, log = 1, debug = 2 };
@@ -16,8 +16,8 @@ class Logger {
   }
 
   constructor() {
-    this.logFunction = (this.production) ? () => {} : console.log;
     this.production = environment.production || false;
+    this.logFunction = (this.production) ? () => {} : console.log;
   }
 
   public setLogFunction(F: any) { 

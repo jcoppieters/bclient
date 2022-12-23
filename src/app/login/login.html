@@ -46,8 +46,8 @@
         </ion-item>
 
         <ion-item *ngIf="current === 'register'">
-          <ion-label position="stacked" for="name">{{ "login.name" |_ }}</ion-label>
-          <ion-input [(ngModel)]="name" name="name" id="name" 
+          <ion-label position="stacked" for="fullname">{{ "login.name" |_ }}</ion-label>
+          <ion-input [(ngModel)]="fullname" name="fullname" id="fullname" 
                     required minlength="4"></ion-input>
           <ion-note slot="helper">{{ "login.name.extra" |_ }}</ion-note>
         </ion-item>
