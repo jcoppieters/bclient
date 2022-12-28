@@ -31,7 +31,7 @@ export const kEmptySettings = {
 
 export interface UserData {
   id?: number;
-  fullname: string;
+  name: string;
   email: string;
   settings: Settings;
   language: string;
@@ -39,13 +39,13 @@ export interface UserData {
   username?: string;  // Cognito UID
 }
 export const kEmptyUser: UserData = { 
-  fullname: "", email: "", phone: "",
+  name: "", email: "", phone: "",
   settings: {...kEmptySettings}, 
   language: "EN"
 };
 
 export interface UserRegister {
-  fullname: string;
+  name: string;
   email: string;
   password: string;
   language: string;

@@ -14,19 +14,44 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-searchbar #searchInput (ionChange)="searchChanged($event)" [debounce]="500"></ion-searchbar>
+  <ion-item>
+    <ion-searchbar #searchInput [(ngModel)]="q"></ion-searchbar>
+    <ion-buttons>
+      <ion-button (click)="search('open')">Search Open</ion-button>
+      <ion-button (click)="search('closed')">Search Closed</ion-button>
+    </ion-buttons>
+  </ion-item>
+
+  <ion-item>
+    <ion-label for="name">Name</ion-label>
+    <ion-input id="name" [(ngModel)]="name"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label for="email">Email</ion-label>
+    <ion-input id="email" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-buttons slot="end">
+      <ion-button (click)="add('open')">Add Open</ion-button>
+      <ion-button (click)="add('closed')">Add Closed</ion-button>
+    </ion-buttons>
+  </ion-item>
+
+  <ion-item>
+    <ion-text>{{message}}</ion-text>
+  </ion-item>
 
   <ion-list>
-    <ion-card *ngFor="let client of clients">
+    <ion-card *ngFor="let user of users">
       <ion-card-header>
-        <ion-card-subtitle>{{client.id}}. {{client.email}} (verified={{client.verified}})</ion-card-subtitle>
-        <ion-card-title>{{client.name}}</ion-card-title>
+        <ion-card-subtitle>{{user.id}}. {{user.email}}</ion-card-subtitle>
+        <ion-card-title>{{user.name}}</ion-card-title>
       </ion-card-header>
     
       <ion-card-content>
-        Phone: {{client.phone}}<br/>
-        Created: {{client.created}}<br/>
-        Language: {{client.language}}
+        {{other(user)}}
       </ion-card-content>
     </ion-card>
   </ion-list>

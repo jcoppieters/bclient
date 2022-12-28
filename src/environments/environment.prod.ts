@@ -3,13 +3,16 @@ import { environment as env } from "./environment";
 export const environment = {
   ...env,
   production: true,
-  server: "https://twjhebvbsh.execute-api.eu-central-1.amazonaws.com",
+  server: "https://tipnznq7b3.execute-api.eu-central-1.amazonaws.com",
   cognito: {
     authenticationFlow: 'USER_PASSWORD_AUTH',
     
-    // blue-user-pool //
-    userPoolId: "eu-central-1_XC0RZjrJz",
-    userPoolClientId: "jrlkj657vi4vun2rdfjc0uegg" // blue-client
+    ///////////////////
+    // BlueTestStack //
+    ///////////////////
+    endpoint: "https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_6WeXlBTwu",
+    userPoolId: "eu-central-1_6WeXlBTwu",
+    userPoolClientId: "676ksbd0qldo4b9sa4p040d0jp",
   }
 
 };

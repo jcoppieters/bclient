@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { UserEvent, User } from '../auth/user';
+import USER, { UserEvent } from '../auth/user';
 import logger from '../core/logger';
 
 
@@ -23,20 +23,19 @@ export class AppComponent implements OnInit {
     { title: 'reminders', url: "", icon: 'bookmark'}
   ];
 
-  constructor(private user: User, 
-              private navCtrl: NavController) {  
+  constructor(private navCtrl: NavController) {  
   }
 
   ngOnInit() {
     logger.log("app", "AppComponent.ngOnInit");
 
-    this.user.on(UserEvent.kLoggedIn, () => {
+    USER.on(UserEvent.kLoggedIn, () => {
       logger.log("app", "AppComponent.ngOnInit -> kLoggedIn");
-      this.username = this.user.getUserData()?.fullname || "";
+      this.username = USER.getUserData()?.name || "";
       this.navCtrl.navigateRoot(this.appPages[0].url);
     });
 
-    this.user.on(UserEvent.kLoggedOut, () => {
+    USER.on(UserEvent.kLoggedOut, () => {
       logger.log("app","AppComponent.ngOnInit -> kLoggedOut");
       this.username = "--";
       this.navCtrl.navigateRoot("/login");
@@ -46,16 +45,16 @@ export class AppComponent implements OnInit {
       this.username = "--";
       this.navCtrl.navigateRoot("/login");
     } else {
-      this.username = this.user.getUserData()?.fullname || "";
+      this.username = USER.getUserData()?.name || "";
     }
   }
 
   public loggedIn(): boolean {
-    return this.user.isLoggedIn();
+    return USER.isLoggedIn();
   }
 
   public doLogout() {
-    this.user.logout();
+    USER.logout();
   }
 
 }

@@ -1,9 +1,9 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonInput, NavController } from '@ionic/angular';
+import { AlertController, IonInput } from '@ionic/angular';
 
 import { AuthService, awsPhone } from '../auth/auth.service';
-import { UserEvent, User } from '../auth/user';
+import USER from '../auth/user';
 import { ServerStatus } from '../core/types';
 import { doAlert, doError } from '../ux/ux';
 import { getLanguage, setLanguage, _ } from '../ux/translate/translate';
@@ -30,7 +30,7 @@ export class LoginPage implements AfterViewInit {
   email: string;      emailOK: boolean;
   password: string;   passwordOK: boolean;
   phone: string;      phoneOK: boolean;
-  fullname: string;   fullnameOK: boolean;
+  name: string;   nameOK: boolean;
   code: string;       codeOK: boolean;
 
   language: string;
@@ -43,20 +43,19 @@ export class LoginPage implements AfterViewInit {
   constructor(private authService: AuthService, 
               private router: Router,
               private ref: ChangeDetectorRef,
-              private alertCtrl: AlertController,
-              private user: User) {
+              private alertCtrl: AlertController) {
 
-    const userData = this.user.getUserData();
+    const userData = USER.getUserData();
     this.email = userData?.email || "";
     this.password = "";
-    this.fullname = userData?.fullname || "";   
+    this.name = userData?.name || "";   
     this.phone = userData?.phone || "";   
     this.code = "";   
     
     this.language = getLanguage();
     this.current = (userData?.email) ? "login" : "register";
 
-    if (this.user.isLoggedIn()) {
+    if (USER.isLoggedIn()) {
       console.log("LoginPage.constructor -> isLoggedIn = true -> redirect")
       this.router.navigateByUrl('/module', { replaceUrl: true })
     } else {
@@ -99,7 +98,7 @@ export class LoginPage implements AfterViewInit {
   // Changes - validations //
   ///////////////////////////
   changed() {
-    this.fullnameOK = (this.fullname.length >= 4);
+    this.nameOK = (this.name.length >= 4);
     this.passwordOK = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\^$*.[\]{}()?"!@#%&/\\,><':;|_~`=+\- ])[A-Za-z0-9^$*.[\]{}()?"!@#%&/\\,><':;|_~`=+\- ]{8,256}$/.test(this.password);
     this.codeOK = (this.code.length === 6);
     this.phoneOK = (this.phone.length >= 10);
@@ -109,7 +108,7 @@ export class LoginPage implements AfterViewInit {
   // and "OK" for each action
   registerOK(): boolean {
     this.changed();
-    return this.emailOK && this.fullnameOK && this.passwordOK; // && this.phoneOK;
+    return this.emailOK && this.nameOK && this.passwordOK; // && this.phoneOK;
   }
   confirmEmailOK(): boolean {
     this.changed();
@@ -153,7 +152,7 @@ export class LoginPage implements AfterViewInit {
       this.phone = awsPhone(this.phone);
       const user: UserRegister = {
         email: this.email, password: this.password, 
-        fullname: this.fullname, language: this.language, 
+        name: this.name, language: this.language, 
         phone: this.phone
       };
       const resp = await this.authService.register(user);

@@ -1,21 +1,20 @@
 import { Injectable } from "@angular/core";
 import { CanActivate, CanLoad, Router, UrlTree } from "@angular/router";
-import { User } from "./user";
+import USER from "./user";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutoLogin implements CanLoad, CanActivate {
 
-  constructor(private user: User,
-              private router: Router) {
+  constructor(private router: Router) {
     console.log("AutoLogin.constructor");
   }
 
   async canLoad(): Promise<boolean | UrlTree> {
-    console.log("AutoLogin.canLoad -> id-token: " + this.user.getIdToken());
+    console.log("AutoLogin.canLoad -> id-token: " + USER.getIdToken());
 
-    const loggedIn = this.user.isLoggedIn();    
+    const loggedIn = USER.isLoggedIn();    
     console.log("AutoLogin.canLoad -> returns: " + ! loggedIn);
 
     if (loggedIn) {

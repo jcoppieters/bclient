@@ -28,8 +28,7 @@ const setModeViaQueryparam = (): Mode | undefined => {
   imports: [BrowserModule, HttpClientModule, AppRoutingModule,  UXModule,
             LoginPageModule, 
             IonicModule.forRoot({ backButtonText: '', mode: setModeViaQueryparam() })],
-  providers: [
-              { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

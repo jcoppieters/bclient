@@ -1,4 +1,3 @@
-import { Injectable } from "@angular/core";
 import { CognitoAccessToken, CognitoIdToken, CognitoRefreshToken } from "amazon-cognito-identity-js";
 import * as EventEmitter from "events";
 import { kEmptyUser, settings, UserData } from "./types";
@@ -8,9 +7,6 @@ import logger from "../core/logger";
 export enum UserEvent {kLoggedIn = "login", kLoggedOut = "logout"};
 
 
-@Injectable({
-  providedIn: 'root'
-})
 export class User {
 
   private user: UserData = null;
@@ -131,3 +127,5 @@ export class User {
   }
 
 }
+
+export default new User();

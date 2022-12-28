@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { CanActivate, Router, UrlTree } from "@angular/router";
 import logger from "../core/logger";
-import { User } from "./user";
+import USER from "./user";
 
 
 @Injectable({
@@ -9,13 +9,12 @@ import { User } from "./user";
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private user: User, 
-              private router: Router) {
+  constructor(private router: Router) {
     logger.log("auth", "AuthGuard.constructor");
   }
 
   async canActivate(): Promise<boolean | UrlTree> {
-    const loggedIn = this.user.isLoggedIn();
+    const loggedIn = USER.isLoggedIn();
     logger.log("auth", "AuthGuard.CanActivate -> loggedIn: " + loggedIn);
 
     if (loggedIn) {

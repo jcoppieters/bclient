@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CognitoIdToken, CognitoUser } from 'amazon-cognito-identity-js';
 import { environment } from '../../environments/environment';
 import { userPool } from '../auth/auth.service';
-import { User } from '../auth/user';
+import USER from '../auth/user';
 import logger, { LogLevel } from './logger';
 import { ServerError, ServerResponse, ServerStatus } from './types';
 
@@ -14,14 +14,16 @@ import { ServerError, ServerResponse, ServerStatus } from './types';
 // v1.2 - dec 2022 - version for lambda function url's
 
 @Injectable({ providedIn: 'root' })
-export class HttpService  {
+export class HttpService {
   url: string;
 
-  constructor(private httpClient: HttpClient,
-              protected user: User) {    
+  constructor(private httpClient: HttpClient, private handler: HttpHandler) {    
     
     logger.setLogLevel("http", LogLevel.debug)
-    logger.log("http", "HttpService.constructor -> using: " + environment.server + ", logged in: " + this.user.isLoggedIn());
+    logger.log("http", "HttpService.constructor -> using: " + environment.server + ", logged in: " + USER.isLoggedIn() + ", injected httpClient: " + !!this.httpClient );
+    if (!this.httpClient) {
+      console.log("We don't have a httpClient... won't work guys...")
+    }
     this.use(environment.server);
   }
 
@@ -74,6 +76,8 @@ export class HttpService  {
 
   async executor(call: () => Promise<any>): Promise<ServerResponse> {
     try {
+      logger.log("http", "HttpService.executor (1) -> call with httpClient " + !!this.httpClient);
+
       const response = await call();
       logger.log("http", "HttpService.executor (1) -> body: " + JSON.stringify(response.body));
       
@@ -99,7 +103,7 @@ export class HttpService  {
           if (e.status === 401) {
             // either again: authentication failed -> logout in the UX too
             logger.log("http", "HttpService.executor (2) -> 401 response -> logout & redirect to login page");
-            this.user.logout();
+            USER.logout();
             return {status: ServerStatus.kError, message: "Session expired or wrong credentials"};
 
           } else {
@@ -118,8 +122,8 @@ export class HttpService  {
   }
 
   async getNewAccessToken(): Promise<CognitoIdToken> {
-    const refreshToken = this.user.getRefreshToken();
-    const cognitoUser = new CognitoUser({Username: this.user.getUserData()?.email || "", Pool: userPool});
+    const refreshToken = USER.getRefreshToken();
+    const cognitoUser = new CognitoUser({Username: USER.getUserData()?.email || "", Pool: userPool});
 
     return new Promise( (resolve, reject) => {
       cognitoUser.refreshSession(refreshToken, (err, session) => {
@@ -130,7 +134,7 @@ export class HttpService  {
         } else {
           logger.log("http", "HttpService.getNewAccessToken -> access token: ", session.accessToken);
           // call "storeTokens", not "login", we don't want to alert the rest of the application
-          this.user.storeTokens(session.idToken, session.accessToken, session.refreshToken)
+          USER.storeTokens(session.idToken, session.accessToken, session.refreshToken)
           resolve(session.idToken);
         }
       })
@@ -147,10 +151,9 @@ export class HttpService  {
 
   headers() {
     const h = {"Cache-Control": "no-cache, no-store"};
-    const token = this.user.getAccessToken();
+    const token = USER.getAccessToken();
     if (token) {
-      h["Authorization"] = "bearer " + token.getJwtToken();
-      h["XAuthorization"] = "bearer " + token.getJwtToken();
+      h["Authorization"] = /* "bearer " + */ token.getJwtToken();
     }
     return h;
   }

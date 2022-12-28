@@ -1,26 +1,21 @@
 import { Injectable } from "@angular/core";
 import { HttpService } from "../core/httpService";
-import { ServerResponse, ServerStatus } from "../core/types";
-import { environment } from '../../environments/environment';
+import { ServerResponse } from "../core/types";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientService extends HttpService {
-  async search(q: string): Promise<ServerResponse> {
 
-    //if (environment.server.indexOf("localhost") < 0)
-    //  this.use("https://tyftehgvsysxj4ph3ttlafepj40clopa.lambda-url.eu-central-1.on.aws");
+  async search(lambda: string, q: string): Promise<ServerResponse> {
+    let resp = <any> await this.get(`/${lambda}/list?q=${q}`);
+    console.log("ClientService.search("+lambda+") -> resp: ", resp);
+    return resp;
+  }
 
-    //const respD = <any> await this.get("/demo/error?code=401");
-    //console.log("ClientService.ping -> respD: ", respD);
-
-
-    if (environment.server.indexOf("localhost") < 0)
-      this.use("https://xtvjkx5w52l3nim5rjwwcfczgu0tnsrm.lambda-url.eu-central-1.on.aws");
-
-    let resp = <any> await this.get("/contacts/list?q=" + q);
-    console.log("ClientService.search -> resp: ", resp);
+  async add(lambda: string, name: string, email: string) {
+    let resp = <any> await this.post(`/${lambda}/add`, {user: {name, email}});
+    console.log("ClientService.add("+lambda+") -> resp: ", resp);
     return resp;
   }
 }

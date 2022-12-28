@@ -5,6 +5,7 @@ import { HttpService } from '../core/httpService';
 import logger from '../core/logger';
 import { ServerResponse, ServerStatus } from '../core/types';
 import { AuthResponse, UserRegister, UserData, UserResponse } from './types';
+import USER from './user';
 
 export interface ILoginUser {
   email: string;
@@ -22,7 +23,7 @@ if (environment.cognito["endpoint"])
 
   
 export const userPool = new CognitoUserPool(poolData);
-const blueAttributes = ["fullname", "email", "phone_number", "locale"];
+const blueAttributes = ["name", "email", "phone_number", "locale"];
 
 export function awsPhone(phone:string): string {
   if (!phone) return "";
@@ -37,6 +38,14 @@ export function awsPhone(phone:string): string {
   providedIn: 'root'
 })
 export class AuthService extends HttpService {
+
+  // if we want to use the lambda URL's, this is the place to set a URL per service.
+  //
+  // constructor(httpClient: HttpClient,
+  //   user: User) {
+  //   super(httpClient, user);
+  //   this.use("https://zw4bmv7ftpaddwqmyxfh4h5puy0iqmfo.lambda-url.eu-central-1.on.aws");
+  // }
 
   async resetPassword(email: string): Promise<ServerResponse> {
     return new Promise((resolve, reject) => {
@@ -86,6 +95,7 @@ export class AuthService extends HttpService {
     attributes.push(new CognitoUserAttribute({Name: "phone_number", Value: user.phone}))
 
     return new Promise((resolve, reject) => {
+      console.log("register -> USER: ", USER);
       userPool.signUp(user.email, user.password, attributes, [], (err, result: ISignUpResult) => {
         if (err) {
           logger.err("auth", "AuthService.register -> error registering", err);
@@ -94,9 +104,9 @@ export class AuthService extends HttpService {
         } else {
           // already remember the user, but no token yet
           logger.debug("auth", "AuthService.register -> SignUpResult: ", result);
-          const localUser = {email: user.email, language: user.language, fullname: user.fullname, 
+          const localUser = {email: user.email, language: user.language, name: user.name, 
                              username: result.userSub};
-          this.user.setUserData(localUser);
+          USER.setUserData(localUser);
           resolve({status: ServerStatus.kOK, user: localUser});
 
           // done by a Cognito trigger 
@@ -153,14 +163,14 @@ export class AuthService extends HttpService {
           const idToken: CognitoIdToken = result.getIdToken();
           const refreshToken: CognitoRefreshToken = result.getRefreshToken();
 
-          this.user.login(idToken, accessToken, refreshToken);
+          USER.login(idToken, accessToken, refreshToken);
 
           // ask our server for more client details based on the access-token
           // DB operation uses current token
           // return the user + id-token/expiry
           this.getDBUser()
             .then( resp => {
-              this.user.setUserData(resp.user);
+              USER.setUserData(resp.user);
               logger.debug("auth", "AuthService.login -> Data from Database: ", resp);
               resolve({...resp, username: accessToken.payload.username, 
                        token: idToken.getJwtToken(), expires: idToken.getExpiration()});
@@ -186,13 +196,13 @@ export class AuthService extends HttpService {
   async logout(): Promise<void> {
     let cognitoUser = userPool.getCurrentUser();
     cognitoUser?.signOut(() => {
-      this.user.logout();
+      USER.logout();
     });
   }
   async globalLogout(): Promise<void> {
     let cognitoUser = userPool.getCurrentUser();
     cognitoUser?.globalSignOut({ 
-      onSuccess: (msg: string) => { this.user.logout(); },
+      onSuccess: (msg: string) => { USER.logout(); },
       onFailure: (err: Error)  => { logger.err("auth", "AuthService.globalLogout -> Cognitor error: " + err.message); }
     });
   }
@@ -309,7 +319,8 @@ CognitoUserSession
 
   async getDBUser(): Promise<UserResponse> {
     // using the token in the header to select the user
-    return <Promise<UserResponse>> this.get("/users/get");
+    console.log("AuthService.getDBUser -> this: ", this);
+    return <Promise<UserResponse>> this.get("/demo/list?email=" + USER.getUserData()?.email);
   }
 
   async deleteDBUser(): Promise<ServerResponse> {
