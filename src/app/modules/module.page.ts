@@ -37,9 +37,10 @@ export class ModulePage implements OnInit {
     return this.cleanup(r);
   }
 
-  async search(lambda) {
+  async search() {
     console.log("ModulePage.search -> q = " + this.q);
-    const resp = await this.clientService.search(lambda, this.q);
+    const resp = await this.clientService.search(this.q);
+    
     if (resp.status === ServerStatus.kOK) {
       this.users = resp.users as Array<any>;
       this.message = "response count: " + this.users.length;
@@ -49,9 +50,10 @@ export class ModulePage implements OnInit {
     }
   }
 
-  async add(lambda) {
+  async add() {
     console.log("ModulePage.add -> name: " + this.name + ", email: " + this.email);
-    const resp = await this.clientService.add(lambda, this.name, this.email);
+    const resp = await this.clientService.add(this.name, this.email);
+
     if (resp.status === ServerStatus.kOK) {
       this.message = "response: " + this.cleanup(resp);
     } else {

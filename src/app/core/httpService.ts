@@ -53,6 +53,9 @@ export class HttpService {
     }
     */
 
+    // demo lambda handler
+    httpResponse.status = httpResponse.status || httpResponse.statusCode;
+
     logger.log("http", "HttpService.assertOK -> httpResonse: ", httpResponse);
 
     // http error
@@ -62,7 +65,8 @@ export class HttpService {
       throw(err);
     }
 
-    let lambdaResponse = httpResponse.body as ServerResponse;
+    let lambdaResponse = (httpResponse.body || {status: ServerStatus.kError, message: "Empty body"}) as ServerResponse;
+    if (!lambdaResponse.status) lambdaResponse.status = ServerStatus.kOK;
 
     // lambda errors (with detail-status in code)
     if ((!lambdaResponse) || (lambdaResponse.status != ServerStatus.kOK)) {

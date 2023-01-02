@@ -5,22 +5,22 @@
 ///////////////////
 // BlueTestStack //
 ///////////////////
-export const environmentTest = {
+export const environment = {
   name: "BLUE",
   production: false,
-  server: "https://4l8l7tfx50.execute-api.eu-central-1.amazonaws.com",
+  server: "https://zybqy379ce.execute-api.eu-central-1.amazonaws.com",
   cognito: {
     authenticationFlow: 'USER_PASSWORD_AUTH',
-    endpoint: "https://cognito-idp.eu-central-1.amazonaws.com/",
-    userPoolId: "eu-central-1_imDvAzK5y",
-    userPoolClientId: "2eq09jv8qgfh89vi6tjksoapmh",
+    endpoint: "https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_f37XoCfUN",
+    userPoolId: "eu-central-1_f37XoCfUN",
+    userPoolClientId: "523epauvbcd4fq4thoa56d2psf",
   }
 };
 
 ////////////////
 // Blue-local //
 ////////////////
-export const environment = {
+export const environmentLocal = {
   name: "BLUE",
   production: false,
   server: "http://localhost:9229/api",

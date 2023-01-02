@@ -7,15 +7,15 @@ import { ServerResponse } from "../core/types";
 })
 export class ClientService extends HttpService {
 
-  async search(lambda: string, q: string): Promise<ServerResponse> {
-    let resp = <any> await this.get(`/${lambda}/list?q=${q}`);
-    console.log("ClientService.search("+lambda+") -> resp: ", resp);
+  async search(q: string): Promise<ServerResponse> {
+    let resp = <any> await this.get(`/demo/list?q=${q}`);
+    console.log("ClientService.search() -> resp: ", resp);
     return resp;
   }
 
-  async add(lambda: string, name: string, email: string) {
-    let resp = <any> await this.post(`/${lambda}/add`, {user: {name, email}});
-    console.log("ClientService.add("+lambda+") -> resp: ", resp);
+  async add(name: string, email: string) {
+    let resp = <any> await this.post(`/demo/add`, {user: {name, email, language: "NL"}});
+    console.log("ClientService.add() -> resp: ", resp);
     return resp;
   }
 }

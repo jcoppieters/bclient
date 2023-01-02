@@ -17,8 +17,7 @@
   <ion-item>
     <ion-searchbar #searchInput [(ngModel)]="q"></ion-searchbar>
     <ion-buttons>
-      <ion-button (click)="search('open')">Search Open</ion-button>
-      <ion-button (click)="search('closed')">Search Closed</ion-button>
+      <ion-button (click)="search()">Search</ion-button>
     </ion-buttons>
   </ion-item>
 
@@ -34,8 +33,7 @@
 
   <ion-item>
     <ion-buttons slot="end">
-      <ion-button (click)="add('open')">Add Open</ion-button>
-      <ion-button (click)="add('closed')">Add Closed</ion-button>
+      <ion-button (click)="add()">Add</ion-button>
     </ion-buttons>
   </ion-item>
 

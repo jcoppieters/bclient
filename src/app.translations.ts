@@ -16,7 +16,7 @@ export const translations = {
     'global.welcome': "Welkom",
 
     'app.title': 'Blauw - Bob de Blauwer',
-      'modules.clients': 'Klanten',
+      'modules.clients': 'Gebruikers',
       'modules.offers': 'Offertes',
       'modules.jobs': 'Jobs',
       'modules.invoices': 'Facturen',
@@ -25,7 +25,7 @@ export const translations = {
       'action.todo': 'To Do',
       'action.reminders': 'Herinneringen',
 
-    'clients.title': 'Clients',
+    'clients.title': 'Gebruikers',
       'clients.tab.xx': 'x x x',
       'clients.search': 'Zoeken',
 
@@ -95,7 +95,7 @@ export const translations = {
     'global.welcome': "Welkom",
     
     'app.title': 'Blue - Bob the Bluer',
-    'modules.clients': 'Clients',
+    'modules.clients': 'Users',
     'modules.offers': 'Offers',
     'modules.jobs': 'Jobs',
     'modules.invoices': 'Invoices',
@@ -104,13 +104,13 @@ export const translations = {
     'action.todo': 'To Do',
     'action.reminders': 'Reminders',
 
-    'clients.title': 'Clients',
+    'clients.title': 'Users',
       'clients.tab.xx': 'x x x',
       'clients.search': 'Search',
 
     'offers.title': 'Offers',
     'jobs.title': 'Jobs',
-    'invoices.title': 'Clients',
+    'invoices.title': 'Invoices',
     'reports.title': 'Reports',
 
     'login.title': 'Start',
@@ -175,7 +175,7 @@ export const translations = {
     'global.welcome': "Welkom",
     
     'app.title': 'Blue - Bob le Blue',
-      'modules.clients': 'Clients',
+      'modules.clients': 'Utilisateurs',
       'modules.offers': 'Offres',
       'modules.jobs': 'Jobs',
       'modules.invoices': 'Factures',
@@ -184,13 +184,13 @@ export const translations = {
       'action.todo': 'To Do',
       'action.reminders': 'Reminders',
 
-    'clients.title': 'Clients',
+    'clients.title': 'Utilisateurs',
       'clients.tab.xx': 'x x x',
       'clients.search': 'Chercher',
 
     'offers.title': 'Offres',
     'jobs.title': 'Jobs',
-    'invoices.title': 'Clients',
+    'invoices.title': 'Factures',
     'reports.title': 'Rapports',
 
     'login.title': 'Démarrage',
